@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Project Overview — Café Martinez × Tiendanube</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:#f5f4f0;color:#1a1a1a}
+  a{color:inherit;text-decoration:none}
+
+  /* NAV */
+  nav{background:#1a1a1a;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100}
+  .nav-brand{color:#fff;font-size:14px;font-weight:600;letter-spacing:.3px}
+  .nav-badge{background:#c8a96e;color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;letter-spacing:.5px}
+
+  /* HERO */
+  .hero{background:#1a1a1a;color:#fff;padding:56px 32px 48px;position:relative;overflow:hidden}
+  .hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='1' fill='%23ffffff08'/%3E%3C/svg%3E");background-size:30px 30px}
+  .hero-inner{max-width:800px;margin:0 auto;position:relative}
+  .hero-tag{display:inline-flex;align-items:center;gap:6px;background:#c8a96e20;border:1px solid #c8a96e50;color:#c8a96e;font-size:11px;font-weight:700;padding:4px 12px;border-radius:99px;letter-spacing:.8px;margin-bottom:20px;text-transform:uppercase}
+  .hero h1{font-size:clamp(28px,5vw,44px);font-weight:700;line-height:1.15;margin-bottom:12px}
+  .hero h1 span{color:#c8a96e}
+  .hero-sub{font-size:15px;color:#aaa;line-height:1.6;max-width:520px;margin-bottom:32px}
+  .hero-stats{display:flex;gap:32px;flex-wrap:wrap}
+  .stat{display:flex;flex-direction:column;gap:2px}
+  .stat-val{font-size:22px;font-weight:700;color:#c8a96e}
+  .stat-lbl{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px}
+
+  /* MAIN */
+  main{max-width:800px;margin:0 auto;padding:40px 24px 80px}
+
+  /* SECTION TITLES */
+  .section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:#888;margin-bottom:14px;padding-left:4px}
+
+  /* CARDS */
+  .card{background:#fff;border-radius:16px;padding:24px;margin-bottom:12px;border:1px solid #ebe9e3}
+  .card + .card{margin-top:0}
+
+  /* INFO GRID */
+  .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:28px}
+  .info-card{background:#fff;border-radius:12px;padding:16px;border:1px solid #ebe9e3}
+  .info-icon{font-size:22px;margin-bottom:8px}
+  .info-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:#999;margin-bottom:4px}
+  .info-val{font-size:14px;font-weight:700;color:#1a1a1a}
+
+  /* SPRINTS */
+  .sprint-row{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid #f0ede7}
+  .sprint-row:last-child{border-bottom:none}
+  .sprint-num{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+  .sprint-num.done{background:#d1fae5;color:#059669}
+  .sprint-num.progress{background:#e0e7ff;color:#4338ca}
+  .sprint-num.pending{background:#f5f5f5;color:#999}
+  .sprint-info{flex:1}
+  .sprint-name{font-size:13px;font-weight:600;color:#1a1a1a}
+  .sprint-dates{font-size:11px;color:#999;margin-top:2px}
+  .sprint-badge{font-size:12px}
+
+  /* TEAM */
+  .team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+  .team-card{background:#faf9f7;border-radius:12px;padding:14px 16px;border:1px solid #ebe9e3;display:flex;align-items:center;gap:12px}
+  .team-avatar{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+  .team-name{font-size:13px;font-weight:600;color:#1a1a1a}
+  .team-role{font-size:11px;color:#999;margin-top:1px}
+  .team-email{font-size:11px;color:#c8a96e;margin-top:2px;word-break:break-all}
+
+  /* INTEGRATIONS */
+  .int-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f0ede7}
+  .int-row:last-child{border-bottom:none}
+  .int-icon{width:36px;height:36px;border-radius:10px;background:#f5f4f0;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .int-name{font-size:13px;font-weight:600}
+  .int-status{font-size:11px;color:#999;margin-top:2px}
+  .badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;margin-left:8px;vertical-align:middle}
+  .badge-amber{background:#fef3c7;color:#92400e}
+  .badge-green{background:#d1fae5;color:#065f46}
+  .badge-blue{background:#e0e7ff;color:#3730a3}
+
+  /* ALERTS */
+  .alert{border-radius:10px;padding:12px 16px;margin-bottom:8px;font-size:13px;line-height:1.5;border-left:3px solid}
+  .alert-red{background:#fff5f5;border-color:#ef4444;color:#7f1d1d}
+  .alert-amber{background:#fffbeb;border-color:#f59e0b;color:#78350f}
+
+  /* APPS */
+  .app-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f0ede7}
+  .app-row:last-child{border-bottom:none}
+  .app-icon{width:36px;height:36px;border-radius:10px;background:#f5f4f0;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .app-link{font-size:11px;color:#c8a96e;margin-top:2px}
+
+  /* FOOTER */
+  footer{background:#1a1a1a;color:#666;text-align:center;padding:28px;font-size:12px}
+  footer span{color:#c8a96e}
+
+  /* PROGRESS BAR */
+  .sprint-progress{background:#f5f4f0;border-radius:99px;height:6px;margin-top:20px;overflow:hidden}
+  .sprint-fill{width:37.5%;background:linear-gradient(90deg,#c8a96e,#e8c98e);height:100%;border-radius:99px}
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand">☕ Café Martinez × Tiendanube Evolución</span>
+  <span class="nav-badge">HighCustom</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">📋 Project Overview</div>
+    <h1>Bienvenidos al proyecto<br><span>Café Martinez</span></h1>
+    <p class="hero-sub">Seguimiento del proyecto de migración y desarrollo de la nueva tienda online sobre Tiendanube Evolución, en colaboración con el equipo de Innew.</p>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-val">01/04/2026</span><span class="stat-lbl">Kick Off</span></div>
+      <div class="stat"><span class="stat-val">Jun / Jul 2026</span><span class="stat-lbl">Go Live estimado</span></div>
+      <div class="stat"><span class="stat-val">Sprint 4/8</span><span class="stat-lbl">Sprint actual</span></div>
+      <div class="stat"><span class="stat-val">Innew</span><span class="stat-lbl">Agencia</span></div>
+    </div>
+    <div class="sprint-progress"><div class="sprint-fill"></div></div>
+    <div style="font-size:11px;color:#666;margin-top:8px">3 de 8 sprints completados — Sprint 4 en curso</div>
+  </div>
+</div>
+
+<main>
+
+  <!-- INFO CARDS -->
+  <div class="info-grid">
+    <div class="info-card"><div class="info-icon">🚀</div><div class="info-lbl">Kick Off</div><div class="info-val">01/04/2026</div></div>
+    <div class="info-card"><div class="info-icon">🏁</div><div class="info-lbl">Go Live</div><div class="info-val">Últ. sem. jun / jul 2026</div></div>
+    <div class="info-card"><div class="info-icon">🎨</div><div class="info-lbl">Agencia</div><div class="info-val">Innew</div></div>
+    <div class="info-card"><div class="info-icon">🔌</div><div class="info-lbl">Integración</div><div class="info-val">SAP</div></div>
+  </div>
+
+  <!-- SPRINTS -->
+  <div class="section-title">📅 Sprints — Gantt</div>
+  <div class="card" style="margin-bottom:28px">
+    <div class="sprint-row"><div class="sprint-num done">1</div><div class="sprint-info"><div class="sprint-name">Onboarding & Config. Espacios de trabajo</div><div class="sprint-dates">Abr 20 – May 1</div></div><span class="sprint-badge">✅</span></div>
+    <div class="sprint-row"><div class="sprint-num done">2</div><div class="sprint-info"><div class="sprint-name">Blueprints Backoffice + Bases Diseño</div><div class="sprint-dates">May 1 – May 8</div></div><span class="sprint-badge">✅</span></div>
+    <div class="sprint-row"><div class="sprint-num done">3</div><div class="sprint-info"><div class="sprint-name">Diseño Home + Search Layout + Product</div><div class="sprint-dates">May 8 – May 17</div></div><span class="sprint-badge">✅</span></div>
+    <div class="sprint-row"><div class="sprint-num progress">4</div><div class="sprint-info"><div class="sprint-name">Implementación Home + Check BackOffice</div><div class="sprint-dates">May 17 – May 22</div></div><span class="sprint-badge">🔄</span></div>
+    <div class="sprint-row"><div class="sprint-num pending">5</div><div class="sprint-info"><div class="sprint-name">Implementación Search + Product + Pág. Ayuda</div><div class="sprint-dates">May 22 – Jun 1</div></div><span class="sprint-badge">⏳</span></div>
+    <div class="sprint-row"><div class="sprint-num pending">6</div><div class="sprint-info"><div class="sprint-name">Implementación Pág. Ayuda + Account & Login</div><div class="sprint-dates">Jun 1 – Jun 8</div></div><span class="sprint-badge">⏳</span></div>
+    <div class="sprint-row"><div class="sprint-num pending">7</div><div class="sprint-info"><div class="sprint-name">Diseño & Implementación Checkout + Mails</div><div class="sprint-dates">Jun 8 – Jun 22</div></div><span class="sprint-badge">⏳</span></div>
+    <div class="sprint-row"><div class="sprint-num pending">8</div><div class="sprint-info"><div class="sprint-name">Testing Integral + Go Live 🚀</div><div class="sprint-dates">Jun 22 – Jul 2</div></div><span class="sprint-badge">⏳</span></div>
+  </div>
+
+  <!-- EQUIPO -->
+  <div class="section-title">👥 Equipo del proyecto</div>
+  <div class="team-grid" style="margin-bottom:28px">
+    <div class="team-card"><div class="team-avatar" style="background:#e0e7ff;color:#3730a3">ML</div><div><div class="team-name">Maria Laura Troisi</div><div class="team-role">Referente — Café Martinez</div><div class="team-email">mltroisi@cafemartinez.com.ar</div></div></div>
+    <div class="team-card"><div class="team-avatar" style="background:#e0e7ff;color:#3730a3">CC</div><div><div class="team-name">Cecilia Cutuli</div><div class="team-role">Referente — Café Martinez</div><div class="team-email">ccutuli@cafemartinez.com.ar</div></div></div>
+    <div class="team-card"><div class="team-avatar" style="background:#d1fae5;color:#065f46">MV</div><div><div class="team-name">María Victoria Bravo</div><div class="team-role">PM — Innew</div><div class="team-email">victoria.bravo@innew.la</div></div></div>
+    <div class="team-card"><div class="team-avatar" style="background:#d1fae5;color:#065f46">JS</div><div><div class="team-name">Jennifer Sotomayor</div><div class="team-role">PM — Innew</div><div class="team-email">jennifer.sotomayor@innew.la</div></div></div>
+    <div class="team-card"><div class="team-avatar" style="background:#fef3c7;color:#92400e">XC</div><div><div class="team-name">Ximena Charras</div><div class="team-role">Tech — Tiendanube</div><div class="team-email">ximena.charras@tiendanube.com</div></div></div>
+    <div class="team-card"><div class="team-avatar" style="background:#fce7f3;color:#9d174d">ZT</div><div><div class="team-name">Zuleinys Tirado</div><div class="team-role">Onboarding Analyst — Tiendanube</div><div class="team-email">zuleinys.tirado@tiendanube.com</div></div></div>
+  </div>
+
+  <!-- INTEGRACIONES Y APPS -->
+  <div class="section-title">🔌 Integraciones & Aplicaciones</div>
+  <div class="card" style="margin-bottom:28px">
+    <div class="int-row">
+      <div class="int-icon">🏢</div>
+      <div><div class="int-name">SAP <span class="badge badge-amber">Implementador en definición</span></div><div class="int-status">Integración ERP — Coordinación pendiente con equipo Café Martinez</div></div>
+    </div>
+    <div class="int-row">
+      <div class="int-icon">💳</div>
+      <div><div class="int-name">Fiserv <span class="badge badge-green">Medio de pago</span></div><div class="int-status">Instalación y configuración en tienda</div></div>
+    </div>
+    <div class="int-row">
+      <div class="int-icon">💳</div>
+      <div><div class="int-name">Nave <span class="badge badge-green">Medio de pago</span></div><div class="int-status">Instalación y configuración en tienda</div></div>
+    </div>
+    <div class="int-row">
+      <div class="int-icon">💳</div>
+      <div><div class="int-name">Pago Nube <span class="badge badge-amber">Post carga de productos</span></div><div class="int-status">Activar después de que los productos estén creados — requiere validación de identidad</div></div>
+    </div>
+    <div class="int-row">
+      <div class="int-icon">📦</div>
+      <div><div class="int-name">Bluemail <span class="badge badge-green">Envío</span></div><div class="int-status">Integración de envío definida · Puntos de retiro en sucursales: a definir</div></div>
+    </div>
+    <div class="int-row">
+      <div class="int-icon">📧</div>
+      <div><div class="int-name">Marketing Nube <span class="badge badge-blue">Marketing</span></div><div class="int-status">Integración y personalización de mails transaccionales desde la plataforma</div></div>
+    </div>
+  </div>
+
+  <!-- BLOQUEANTES -->
+  <div class="section-title">🚨 Pendientes importantes</div>
+  <div style="margin-bottom:28px">
+    <div class="alert alert-red">🔴 <strong>SAP:</strong> Implementador aún no definido — coordinación urgente con el equipo de Café Martinez</div>
+    <div class="alert alert-red">🔴 <strong>Catálogo:</strong> Relevamiento pendiente de entrega por Café Martinez — bloquea avance de implementaciones</div>
+    <div class="alert alert-red">🔴 <strong>Aprobación mockups:</strong> Home, PLP y PDP requieren aprobación formal para continuar con implementación</div>
+    <div class="alert alert-amber">🟡 <strong>Puntos de retiro Bluemail:</strong> Definir si se habilitarán sucursales como puntos de retiro</div>
+  </div>
+
+  <!-- CONTACTO -->
+  <div class="section-title">📬 Canal de comunicación</div>
+  <div class="card">
+    <div style="font-size:13px;color:#555;line-height:1.7">
+      El seguimiento del proyecto se gestiona vía <strong>Slack</strong> (room <code style="background:#f0ede7;padding:2px 6px;border-radius:4px;font-size:12px">#cafemartinez-migracion</code>) y <strong>Google Sheets</strong> para el tracking de tareas.<br><br>
+      Las reuniones quincenales de status se realizan con todo el equipo y quedan grabadas para consulta posterior.
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  Proyecto gestionado por <span>Tiendanube Evolución · Onboarding AR</span> · Última actualización: Mayo 2026
+</footer>
+
+</body>
+</html>

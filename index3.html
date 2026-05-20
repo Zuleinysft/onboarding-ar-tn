@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Onboarding Wizard – Tiendanube AR</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#070a0f;--s1:#0e1219;--s2:#141924;--s3:#1c2333;
+  --border:#252d3e;--border2:#2f3a50;
+  --acc:#00e5a0;--acc2:#3d8bff;--acc3:#ff5c7a;--warn:#ffb800;
+  --text:#dde3f0;--muted:#6b7a99;--r:10px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:28px 16px 80px}
+
+/* HEADER */
+.header{text-align:center;margin-bottom:32px;animation:fd .7s ease both}
+.badge{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--border2);border-radius:99px;padding:5px 14px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--acc);font-weight:600;margin-bottom:18px;background:rgba(0,229,160,.05)}
+.badge-dot{width:6px;height:6px;background:var(--acc);border-radius:50%;animation:pulse 2s infinite}
+h1{font-family:'Syne',sans-serif;font-size:clamp(26px,5vw,42px);font-weight:800;line-height:1.1;letter-spacing:-.02em}
+h1 em{font-style:normal;color:var(--acc)}
+.sub{color:var(--muted);font-size:13px;margin-top:10px;font-weight:300}
+
+/* PROGRESS */
+.progress{display:flex;gap:6px;margin-bottom:24px;width:100%;max-width:700px}
+.pdot{height:3px;border-radius:99px;background:var(--border);flex:1;transition:all .4s}
+.pdot.done{background:var(--acc)}.pdot.active{background:var(--acc2)}
+
+/* CARD */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:700px;animation:fu .35s ease both}
+.s-label{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--acc2);margin-bottom:5px}
+.s-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:4px}
+.s-desc{color:var(--muted);font-size:13px;margin-bottom:22px;line-height:1.55}
+
+/* FIELDS */
+.field{margin-bottom:14px}
+label{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:5px;letter-spacing:.05em;text-transform:uppercase}
+label em{font-style:normal;color:var(--acc3);margin-left:3px}
+input[type=text],input[type=url],input[type=date],select,textarea{
+  width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--r);
+  padding:10px 13px;color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:13px;
+  outline:none;transition:border-color .2s,box-shadow .2s
+}
+input:focus,select:focus,textarea:focus{border-color:var(--acc2);box-shadow:0 0 0 3px rgba(61,139,255,.1)}
+select option{background:var(--s2)}
+textarea{resize:vertical;min-height:72px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:500px){.row{grid-template-columns:1fr}}
+
+/* TOGGLES */
+.tg{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
+.tb{background:var(--bg);border:1px solid var(--border2);border-radius:8px;padding:7px 12px;color:var(--muted);font-family:'IBM Plex Sans',sans-serif;font-size:12px;cursor:pointer;transition:all .18s;font-weight:500}
+.tb:hover{border-color:var(--acc2);color:var(--text)}
+.tb.on{background:rgba(61,139,255,.12);border-color:var(--acc2);color:var(--acc2);font-weight:600}
+
+/* HINT */
+.hint{background:rgba(61,139,255,.07);border:1px solid rgba(61,139,255,.18);border-radius:8px;padding:10px 13px;font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6}
+.hint strong{color:var(--acc2)}
+.hint code{font-family:'IBM Plex Mono',monospace;font-size:11px;background:rgba(61,139,255,.15);padding:1px 5px;border-radius:4px;color:var(--acc2)}
+
+/* OUTPUT CARDS */
+.og{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:6px}
+.oc{background:var(--bg);border:1px solid var(--border2);border-radius:10px;padding:14px;cursor:pointer;transition:all .18s;text-align:center}
+.oc:hover{border-color:var(--acc2)}
+.oc.on{border-color:var(--acc);background:rgba(0,229,160,.06)}
+.oc .icon{font-size:20px;margin-bottom:5px}.oc .name{font-size:13px;font-weight:600}.oc .desc{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* NAV */
+.nav{display:flex;gap:10px;margin-top:22px;justify-content:flex-end;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:8px;font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .18s}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--muted)}
+.btn-ghost:hover{border-color:var(--text);color:var(--text)}
+.btn-blue{background:var(--acc2);color:#fff}
+.btn-blue:hover{background:#5aa0ff;transform:translateY(-1px)}
+.btn-green{background:var(--acc);color:#070a0f;font-weight:700}
+.btn-green:hover{background:#00ffb3}
+
+/* SUMMARY */
+.sum-block{margin-bottom:18px}
+.sum-head{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.sum-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:5px 0;font-size:13px}
+.sk{color:var(--muted);flex-shrink:0}
+.sv{color:var(--text);text-align:right;font-weight:500;word-break:break-all}
+.sv a{color:var(--acc);text-decoration:none}.sv a:hover{text-decoration:underline}
+.tag{display:inline-block;border-radius:5px;padding:2px 7px;font-size:11px;font-weight:600;margin:2px}
+.tag.blue{background:rgba(61,139,255,.15);color:var(--acc2)}
+.tag.green{background:rgba(0,229,160,.12);color:var(--acc)}
+.tag.red{background:rgba(255,92,122,.12);color:var(--acc3)}
+.tag.warn{background:rgba(255,184,0,.12);color:var(--warn)}
+
+/* WEEK TABS */
+.week-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;margin-top:8px}
+.wtab{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:all .18s;color:var(--muted);font-family:'IBM Plex Mono',monospace}
+.wtab:hover{border-color:var(--acc2);color:var(--text)}
+.wtab.active{background:rgba(61,139,255,.12);border-color:var(--acc2);color:var(--acc2)}
+.week-panel{display:none}.week-panel.show{display:block}
+
+/* CHECKLIST */
+.cl-section{margin-bottom:4px}
+.cl-head{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px;padding:10px 0 8px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.cl-count{font-family:'IBM Plex Mono',monospace;font-size:11px;background:var(--s3);border-radius:5px;padding:2px 7px;color:var(--muted)}
+
+.cl-item{display:flex;align-items:flex-start;gap:10px;padding:10px 6px;border-bottom:1px solid rgba(37,45,62,.5);cursor:pointer;border-radius:6px;transition:background .15s}
+.cl-item:last-child{border-bottom:none}
+.cl-item:hover{background:rgba(255,255,255,.025)}
+.cl-item.done .cl-text{color:var(--muted);text-decoration:line-through}
+.cl-cb{width:16px;height:16px;margin-top:2px;flex-shrink:0;accent-color:var(--acc2);cursor:pointer}
+.cl-body{flex:1;min-width:0}
+.cl-text{font-size:13px;line-height:1.45;color:var(--text);display:flex;align-items:flex-start;gap:6px;flex-wrap:wrap}
+.cl-resp{font-size:11px;color:var(--muted);margin-top:3px;font-style:italic}
+.cl-links{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px}
+.cl-link{font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--acc2);text-decoration:none;background:rgba(61,139,255,.08);padding:2px 8px;border-radius:4px;transition:background .15s;border:1px solid rgba(61,139,255,.15)}
+.cl-link:hover{background:rgba(61,139,255,.2)}
+.cl-link.help{color:var(--muted);background:rgba(255,255,255,.04);border-color:var(--border2)}
+.cl-link.help:hover{color:var(--text);background:rgba(255,255,255,.08)}
+.cl-note{font-size:11px;color:var(--warn);margin-top:5px;line-height:1.4;background:rgba(255,184,0,.06);border-radius:5px;padding:5px 8px;border-left:2px solid var(--warn)}
+.cl-badge{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border-radius:4px;flex-shrink:0;margin-top:1px;white-space:nowrap}
+.b-req{background:rgba(255,92,122,.12);color:var(--acc3)}
+.b-opt{background:rgba(0,229,160,.1);color:var(--acc)}
+.b-ap{background:rgba(61,139,255,.1);color:var(--acc2)}
+
+/* PROGRESS TRACK */
+.prog-track{background:var(--s3);border-radius:99px;height:6px;margin:10px 0 4px}
+.prog-fill{height:6px;border-radius:99px;background:linear-gradient(90deg,var(--acc2),var(--acc));transition:width .4s}
+.prog-lbl{font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace}
+
+/* AI BOX */
+.ai-box{background:var(--s2);border:1px solid var(--border2);border-radius:12px;padding:18px;margin-bottom:20px}
+.ai-tag{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--acc2);margin-bottom:10px}
+.ai-dots span{display:inline-block;width:6px;height:6px;background:var(--acc2);border-radius:50%;animation:blink 1.2s infinite}
+.ai-dots span:nth-child(2){animation-delay:.2s}.ai-dots span:nth-child(3){animation-delay:.4s}
+.ai-content{font-size:13px;line-height:1.75;color:var(--text);white-space:pre-wrap}
+
+/* SLACK PREVIEW */
+.slack-preview{background:#1a1d21;border:1px solid #2d3136;border-radius:12px;padding:20px;margin-top:12px}
+.slack-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.slack-icon{width:32px;height:32px;background:#4a154b;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.slack-title{font-size:14px;font-weight:600;color:#d1d2d3}.slack-sub{font-size:11px;color:#6e7179}
+.slack-canvas{background:#1e2124;border-radius:8px;padding:14px;font-size:12px;color:#c9cace;line-height:1.7;max-height:280px;overflow-y:auto;white-space:pre-wrap;font-family:'IBM Plex Mono',monospace}
+
+.export-row{display:flex;gap:8px;flex-wrap:wrap;padding-top:16px;margin-top:16px;border-top:1px solid var(--border)}
+
+/* GANTT */
+.gantt{overflow-x:auto;margin-top:12px}
+.gantt table{border-collapse:collapse;font-size:11px;min-width:600px;width:100%}
+.gantt th{background:var(--s3);padding:7px 10px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;border:1px solid var(--border);white-space:nowrap}
+.gantt td{padding:6px 10px;border:1px solid var(--border);color:var(--text);vertical-align:middle}
+.gantt td:first-child{color:var(--muted);font-size:10px;text-transform:uppercase;font-weight:600;white-space:nowrap}
+.gantt td:nth-child(2){font-size:12px}
+.bar{border-radius:4px;height:14px;opacity:.85}
+.bar-s1{background:var(--acc2)}.bar-s2{background:#7c6fff}.bar-s3{background:var(--warn)}.bar-s4{background:var(--acc3)}.bar-s5{background:var(--acc)}
+
+@keyframes fd{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+@keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="badge"><span class="badge-dot"></span> Tiendanube · Onboarding AR</div>
+  <h1>Nuevo Proyecto<br/><em>de Onboarding</em></h1>
+  <p class="sub">Completá los datos del merchant para generar el tablero completo de migración.</p>
+</div>
+
+<div class="progress" id="prog"></div>
+<div class="card" id="card"></div>
+
+<script>
+// ── STEPS ──────────────────────────────────────────────────────────
+const STEPS=[
+  {id:'brand',  lbl:'Paso 1/6',title:'🏷️ Datos de la Marca',        desc:'Información básica del merchant y su tienda Tiendanube.'},
+  {id:'project',lbl:'Paso 2/6',title:'📅 Proyecto y Tiempos',       desc:'Clasificación y fechas clave del proyecto de migración.'},
+  {id:'tech',   lbl:'Paso 3/6',title:'⚙️ URLs y Técnico',           desc:'URL del admin para generar links directos + integraciones con sistemas externos.'},
+  {id:'team',   lbl:'Paso 4/6',title:'👥 Equipo y Agencia',         desc:'Referentes del merchant y agencia de diseño si aplica.'},
+  {id:'payments',lbl:'Paso 5/6',title:'💳 Medios de Pago y Envío',  desc:'Seleccioná los medios de pago y envío que usará la tienda. Esta info se refleja en el tablero y en el análisis de IA.'},
+  {id:'output', lbl:'Paso 6/6',title:'📤 Canal de Comunicación',    desc:'Definí cómo se documenta y comunica el proyecto con el cliente.'},
+];
+const INTEGRATIONS=['ERP','WMS','Alegra','Tango Gestión','Odoo','Siigo','SAP','Bejerman','Stock propio','Otro'];
+const MERCHANT_TYPES=['Standard (30–60d)','LowCustom (45–60d)','MidCustom (60–90d)','HighCustom (90d+)'];
+const OUTPUTS=[
+  {id:'slack', icon:'💬',name:'Slack',        desc:'Canva en el room del proyecto'},
+  {id:'gsheet',icon:'📊',name:'Google Sheets',desc:'Planilla pública compartida'},
+  {id:'gdoc',  icon:'📄',name:'Google Doc',   desc:'Documento con checklist'},
+  {id:'none',  icon:'📋',name:'Solo aquí',    desc:'Checklist interactivo en pantalla'},
+];
+
+// ── FULL TASK DATA (from Gantt sheet) ──────────────────────────────
+function buildAllTasks(a){
+  // a = admin base URL e.g. https://santabohemia4.mitiendanube.com
+  const au=(path)=>a?`${a}${path}`:null;
+  return [
+    {
+      week:'SEMANA 1',label:'Semana 1 — Configuraciones Iniciales',color:'bar-s1',
+      items:[
+        {t:'Activar Página en Construcción',resp:'Merchant',req:true,
+          admin:au('/admin/themes/password-protected'),
+          help:'https://ayuda.tiendanube.com/123265-pagina-en-construccion/como-activar-el-modo-pagina-en-construccion-en-mi-tiendanube',
+          note:null},
+        {t:'Configurar datos del negocio y SEO general',resp:'Merchant',req:true,
+          admin:au('/admin/account/shop'),
+          help:'https://ayuda.tiendanube.com/es_ES/123485-datos-de-tu-cuenta/como-configurar-la-informacion-de-la-seccion-datos-de-mi-negocio',
+          note:null},
+        {t:'Configurar Datos de contacto',resp:'Merchant',req:true,
+          admin:au('/admin/preferences'),
+          help:'https://ayuda.tiendanube.com/123264-informacion-de-contacto/como-mostrar-mi-informacion-de-contacto',
+          note:null},
+        {t:'Configurar datos de facturación',resp:'Merchant',req:true,
+          admin:au('/admin/account/invoices/info'),
+          help:'https://ayuda.tiendanube.com/es_ES/123483-facturas-de-tiendanube/como-modificar-los-datos-de-facturacion-de-mi-tiendanube',
+          note:null},
+        {t:'Agregar código de Data Fiscal (AFIP)',resp:'Merchant',req:true,
+          admin:null,
+          help:'https://ayuda.tiendanube.com/es_ES/afip/como-agregar-el-codigo-de-data-fiscal-de-afip',
+          note:'Obligatorio para tiendas AR. Sin esto la tienda no puede operar legalmente.'},
+        {t:'Agregar usuarios administradores',resp:'Merchant',req:true,
+          admin:au('/admin/account/users'),
+          help:'https://ayuda.tiendanube.com/es_ES/mi-cuenta-socios/como-agregar-usuarios-para-que-administren-mi-panel-de-socio',
+          note:null},
+        {t:'Activar verificación en dos pasos (2FA)',resp:'Merchant',req:true,
+          admin:au('/admin/account/security/authentication-factor'),
+          help:'https://ayuda.tiendanube.com/es_ES/123485-datos-de-tu-cuenta/como-utilizar-la-verificacion-en-dos-pasos-para-proteger-mi-cuenta-de-tiendanube',
+          note:null},
+        {t:'Configurar opciones del checkout',resp:'Merchant',req:true,
+          admin:au('/admin/settings/checkout'),
+          help:'https://ayuda.tiendanube.com/123367-opciones-del-checkout/como-pedir-el-telefono-y-documento-durante-el-proceso-de-compra-en-tu-tiendanube',
+          note:null},
+        {t:'Configurar e-mails automáticos transaccionales',resp:'Merchant',req:true,
+          admin:au('/admin/settings/notifications'),
+          help:'https://ayuda.tiendanube.com/es_ES/123361-emails-automaticos/como-habilitar-el-envio-de-notificaciones-a-mis-clientes-desde-mi-email',
+          note:'⚠️ Importante: el mail de remitente debe ser institucional (no personal). Los clientes recibirán todas las notificaciones desde esa dirección.'},
+        {t:'Agregar botón de WhatsApp',resp:'Merchant',req:false,
+          admin:au('/admin/settings/whatsapp'),
+          help:'https://ayuda.tiendanube.com/es_ES/123362-whatsapp/como-agregar-el-boton-de-whatsapp-en-mi-tiendanube',
+          note:null},
+        {t:'Configurar iconos de redes sociales',resp:'Merchant',req:false,
+          admin:au('/admin/online-store/social-networks'),
+          help:null,note:null},
+        {t:'Configurar centro de despacho / distribución',resp:'Merchant',req:true,
+          admin:au('/admin/settings/locations'),
+          help:null,note:'Paso previo obligatorio antes de configurar medios de envío.'},
+      ]
+    },
+    {
+      week:'SEMANA 2-3',label:'Semanas 2-3 — Catálogo de Productos',color:'bar-s2',
+      items:[
+        {t:'Definir árbol de categorías',resp:'Merchant + AP',req:true,
+          admin:au('/admin/categories'),
+          help:'https://ayuda.tiendanube.com/productos/guia-organizar-los-productos-en-categorias',
+          note:'Alinear con ERP si aplica.'},
+        {t:'Cargar productos piloto (mínimo 5)',resp:'Merchant',req:true,
+          admin:au('/admin/products/add'),
+          help:'https://ayuda.tiendanube.com/productos/como-subir-un-producto-nuevo',
+          note:'Validar título, descripción y SEO de cada producto.'},
+        {t:'Carga masiva de catálogo (Excel)',resp:'Merchant',req:true,
+          admin:au('/admin/products/import'),
+          help:'https://ayuda.tiendanube.com/productos/como-completar-el-excel-de-carga-masiva',
+          note:null},
+        {t:'Optimizar títulos y descripciones SEO de productos',resp:'Merchant',req:false,
+          admin:null,
+          help:'https://ayuda.tiendanube.com/seo/seo-avanzado-de-productos',
+          note:null},
+        {t:'Carga de imágenes (formato, peso, tamaño)',resp:'Merchant',req:true,
+          admin:null,
+          help:'https://ayuda.tiendanube.com/productos/formato-ideal-de-fotografia-de-producto',
+          note:'JPG, 1024×1024px, 100-500kb, sRGB. Usar TinyPNG para comprimir.'},
+        {t:'Integración con ERP (si aplica)',resp:'AP + SE',req:false,
+          admin:null,help:null,
+          note:'Solo si el merchant tiene ERP. Coordinar con equipo de Soluciones Empresariales.'},
+      ]
+    },
+    {
+      week:'SEMANA 3-4',label:'Semanas 3-4 — Diseño e Implementación',color:'bar-s3',
+      items:[
+        {t:'Seleccionar y configurar tema / plantilla',resp:'Merchant + Agencia',req:true,
+          admin:au('/admin/themes'),
+          help:'https://ayuda.tiendanube.com/temas/tienda-de-temas-tiendanube',
+          note:'Low/Mid/High Custom: la agencia necesita acceso FTP.'},
+        {t:'Configurar Home: encabezado, banners con CTA',resp:'Merchant + Agencia',req:true,
+          admin:au('/admin/themes/customize'),
+          help:'https://ayuda.tiendanube.com/diseno/recursos-para-paginas-de-contenido',
+          note:'Testear visualización en mobile antes de avanzar.'},
+        {t:'Configurar menú principal y footer',resp:'Merchant + Agencia',req:true,
+          admin:au('/admin/themes/customize'),
+          help:null,
+          note:'Usar árbol de categorías ya optimizado.'},
+        {t:'Crear páginas de contenido clave',resp:'Merchant',req:true,
+          admin:au('/admin/pages'),
+          help:'https://ayuda.tiendanube.com/seo/como-aparecer-en-buscadores',
+          note:'Incluir: Políticas, FAQs, Contacto, T&C, Devoluciones.'},
+        {t:'Configurar carruseles y productos destacados',resp:'Merchant + Agencia',req:false,
+          admin:au('/admin/themes/customize'),
+          help:null,note:'Usar solo productos con stock disponible.'},
+        {t:'Configurar tabla de talles (si aplica)',resp:'Merchant',req:false,
+          admin:null,help:null,
+          note:'Asociar a variantes de producto (talle/color).'},
+        {t:'Testeo completo en mobile',resp:'AP + Merchant',req:true,
+          admin:null,help:null,
+          note:'Recorrer: Home, PDP, grilla de productos, checkout.'},
+      ]
+    },
+    {
+      week:'SEMANA 4',label:'Semana 4 — Medios de Pago, Envío y Apps',color:'bar-s4',
+      items:[
+        {t:'Configurar medio(s) de pago',resp:'Merchant',req:true,
+          admin:au('/admin/payment-providers'),
+          help:'https://ayuda.tiendanube.com/pagos/guia-medios-de-pago',
+          note:'Personalizar según pasarela: MercadoPago, Prisma, etc.'},
+        {t:'Configurar centro de distribución',resp:'Merchant',req:true,
+          admin:au('/admin/settings/locations'),
+          help:'https://ayuda.tiendanube.com/envios/configurar-envios',
+          note:'Paso previo obligatorio a configurar envíos.'},
+        {t:'Configurar medio(s) de envío',resp:'Merchant',req:true,
+          admin:au('/admin/shipping'),
+          help:'https://ayuda.tiendanube.com/envios/integrar-empresas-de-envio',
+          note:'Opciones: Andreani, OCA, Correo Argentino, etc.'},
+        {t:'Confirmar configuración de e-mails automáticos',resp:'Merchant',req:true,
+          admin:au('/admin/settings/notifications'),
+          help:'https://ayuda.tiendanube.com/es_ES/123361-emails-automaticos/como-habilitar-el-envio-de-notificaciones-a-mis-clientes-desde-mi-email',
+          note:'Verificar que el remitente sea el mail institucional definido en Semana 1.'},
+        {t:'Instalar apps recomendadas (con bonificación Evolución)',resp:'Merchant + AP',req:false,
+          admin:au('/admin/apps'),
+          help:'https://ayuda.tiendanube.com/apps/apps-con-bonificacion-evolucion',
+          note:'Apps prioritarias: Notif. de stock, Trusty, Monitor de pagos, Nuby.'},
+      ]
+    },
+    {
+      week:'SEMANA 5',label:'Semana 5 — Pre Go-Live',color:'bar-s5',
+      items:[
+        {t:'Importación masiva de clientes',resp:'AP + Merchant',req:false,
+          admin:au('/admin/customers/import'),
+          help:null,
+          note:'Solo si el merchant no usa Email Marketing para migrar la base.'},
+        {t:'Completar planilla de redireccionamientos 301',resp:'Merchant',req:false,
+          admin:null,
+          help:'https://ayuda.tiendanube.com/seo/guia-redirects',
+          note:'Obligatorio si es migración desde otra plataforma con URLs indexadas.'},
+        {t:'Verificar propiedad con Google Search Console',resp:'Merchant',req:true,
+          admin:null,
+          help:'https://ayuda.tiendanube.com/seo/verificar-tienda-con-google',
+          note:null},
+        {t:'Enviar sitemap a Google',resp:'Merchant',req:true,
+          admin:null,
+          help:'https://ayuda.tiendanube.com/seo/enviar-sitemap-a-google',
+          note:null},
+        {t:'Configurar continuidad de campañas Meta',resp:'Merchant + AP',req:false,
+          admin:null,
+          help:'https://ayuda.tiendanube.com/marketing/mantener-campanas-meta-al-migrar',
+          note:'Notificar a #onboarding-traffic en Slack antes del Go Live.'},
+        {t:'Configurar Google Shopping / productos Google',resp:'Merchant + AP',req:false,
+          admin:null,
+          help:'https://ayuda.tiendanube.com/marketing/productos-de-google-con-tiendanube',
+          note:null},
+        {t:'Revisar Core Web Vitals (mobile y desktop)',resp:'AP',req:true,
+          admin:null,help:null,note:null},
+        {t:'Compras de prueba — todos los medios de pago',resp:'AP + Merchant',req:true,
+          admin:null,
+          help:'https://ayuda.tiendanube.com/pagos/como-hacer-una-compra-de-prueba',
+          note:'Recorrer el customer journey completo en cada medio de pago.'},
+        {t:'Migración del dominio propio',resp:'Merchant + AP',req:true,
+          admin:au('/admin/domains'),
+          help:'https://ayuda.tiendanube.com/dominios/usar-dominio-propio-en-tiendanube',
+          note:'⚠️ Atención: conservar los mails en el mismo servidor del dominio. No migrar el dominio sin verificar MX records.'},
+      ]
+    },
+  ];
+}
+
+// ── PAYMENTS & SHIPPING CATALOGS ───────────────────────────────────
+const PAYMENT_METHODS=[
+  {id:'mercadopago',   icon:'💙',name:'MercadoPago'},
+  {id:'payway',        icon:'💳',name:'Payway / Prisma'},
+  {id:'mobbex',        icon:'📱',name:'Mobbex'},
+  {id:'decidir',       icon:'🏦',name:'Decidir'},
+  {id:'macro',         icon:'🏧',name:'Macro Click'},
+  {id:'personal_pay',  icon:'📲',name:'Personal Pay'},
+  {id:'transferencia', icon:'🔁',name:'Transferencia bancaria'},
+  {id:'efectivo',      icon:'💵',name:'Rapipago / Pago Fácil'},
+  {id:'tarjeta_propia',icon:'🪙',name:'Tarjeta de crédito propia'},
+  {id:'crypto',        icon:'₿', name:'Cripto'},
+  {id:'otro_pago',     icon:'➕',name:'Otro'},
+];
+const SHIPPING_METHODS=[
+  {id:'andreani',      icon:'📦',name:'Andreani'},
+  {id:'oca',           icon:'📦',name:'OCA'},
+  {id:'correoarg',     icon:'📮',name:'Correo Argentino'},
+  {id:'dhl',           icon:'🌐',name:'DHL'},
+  {id:'fedex',         icon:'🚚',name:'FedEx'},
+  {id:'tn_envios',     icon:'🟣',name:'Tiendanube Envíos'},
+  {id:'propio',        icon:'🏍️',name:'Envío propio / moto'},
+  {id:'retiro',        icon:'🏪',name:'Retiro en local'},
+  {id:'punto',         icon:'📍',name:'Punto de entrega'},
+  {id:'sin_costo',     icon:'🎁',name:'Envío sin costo (umbral)'},
+  {id:'otro_envio',    icon:'➕',name:'Otro'},
+];
+
+// ── STATE ──────────────────────────────────────────────────────────
+let cur=0;
+const D={
+  brand:'',country:'AR',segment:'',
+  url:'',admin_url:'',type:'',start:'',end:'',
+  integrations:[],
+  has_agency:'',agency_name:'',extra:'',
+  contact_name:'',contact_email:'',
+  payment_methods:[],shipping_methods:[],payment_notes:'',shipping_notes:'',
+  outputs:[],slack_room:''
+};
+let checkState={};
+let activeWeek='SEMANA 1';
+
+function tog(arr,v){const i=arr.indexOf(v);if(i>-1)arr.splice(i,1);else arr.push(v)}
+
+// ── WIZARD RENDER ──────────────────────────────────────────────────
+function renderProg(){
+  document.getElementById('prog').innerHTML=
+    STEPS.map((s,i)=>`<div class="pdot ${i<cur?'done':i===cur?'active':''}"></div>`).join('');
+}
+
+function renderStep(){
+  renderProg();
+  const card=document.getElementById('card');
+  card.style.animation='none';void card.offsetWidth;card.style.animation='fu .35s ease both';
+  const s=STEPS[cur];
+  let h=`<div class="s-label">${s.lbl}</div><div class="s-title">${s.title}</div><div class="s-desc">${s.desc}</div>`;
+
+  if(s.id==='brand'){h+=`
+    <div class="field"><label>Nombre de la marca <em>*</em></label>
+      <input type="text" id="f_brand" value="${D.brand}" placeholder="ej. Santa Bohemia, Electro Plus…"/></div>
+    <div class="row">
+      <div class="field"><label>País</label>
+        <select id="f_country">${['AR','MX','BR','CL','CO'].map(c=>`<option ${D.country===c?'selected':''}>${c}</option>`).join('')}</select></div>
+      <div class="field"><label>Segmento / Rubro</label>
+        <input type="text" id="f_segment" value="${D.segment}" placeholder="ej. Indumentaria, Electrónica…"/></div>
+    </div>`;}
+
+  if(s.id==='project'){h+=`
+    <div class="field"><label>Tipo de proyecto</label>
+      <div class="tg">${MERCHANT_TYPES.map(t=>`<button class="tb ${D.type===t?'on':''}" onclick="D.type='${t}';renderStep()">${t}</button>`).join('')}</div></div>
+    <div class="row">
+      <div class="field"><label>Fecha de Kick Off</label>
+        <input type="date" id="f_start" value="${D.start}"/></div>
+      <div class="field"><label>Go Live estimado</label>
+        <input type="date" id="f_end" value="${D.end}"/></div>
+    </div>`;}
+
+  if(s.id==='tech'){
+    let derived='';
+    if(D.url){try{const u=new URL(D.url);derived=`https://${u.hostname}`}catch{}}
+    h+=`
+    <div class="hint"><strong>🔗 Links automáticos:</strong> Al ingresar la URL de la tienda, se generan todos los links directos al admin. Ejemplo: <code>https://santabohemia4.mitiendanube.com</code> → <code>/admin/themes/password-protected</code></div>
+    <div class="field"><label>URL de la tienda <em>*</em></label>
+      <input type="url" id="f_url" value="${D.url}" placeholder="https://nombretienda.mitiendanube.com" oninput="D.url=this.value;deriveAdmin()"/></div>
+    <div class="field"><label>Base del admin (auto-completado)</label>
+      <input type="url" id="f_admin" value="${D.admin_url||derived}" placeholder="Se completa automáticamente…" oninput="D.admin_url=this.value"/></div>
+    <div class="field"><label>Integraciones con sistemas externos <em>(multi)</em></label>
+      <div class="tg">${INTEGRATIONS.map(t=>`<button class="tb ${D.integrations.includes(t)?'on':''}" onclick="tog(D.integrations,'${t}');renderStep()">${t}</button>`).join('')}</div></div>`;}
+
+  if(s.id==='team'){h+=`
+    <div class="row">
+      <div class="field"><label>Nombre del referente</label>
+        <input type="text" id="f_cname" value="${D.contact_name}" placeholder="Nombre y apellido"/></div>
+      <div class="field"><label>Email del referente</label>
+        <input type="text" id="f_cemail" value="${D.contact_email}" placeholder="referente@marca.com"/></div>
+    </div>
+    <div class="field"><label>¿Tiene agencia de diseño?</label>
+      <div class="tg">${['Sí, tiene agencia','No, diseño propio','Por definir'].map(t=>`<button class="tb ${D.has_agency===t?'on':''}" onclick="D.has_agency='${t}';renderStep()">${t}</button>`).join('')}</div></div>
+    ${D.has_agency==='Sí, tiene agencia'?`<div class="field"><label>Nombre de la agencia</label>
+      <input type="text" id="f_agency" value="${D.agency_name}" placeholder="Nombre de la agencia"/></div>`:''}
+    <div class="field"><label>Notas del kick off</label>
+      <textarea id="f_extra" placeholder="Particularidades, acuerdos, restricciones del proyecto…">${D.extra}</textarea></div>`;}
+
+  if(s.id==='payments'){
+    // helper: render a toggle grid for a catalog
+    const grid=(catalog,arr,key)=>catalog.map(m=>`
+      <button class="tb pm-btn ${arr.includes(m.id)?'on':''}"
+        onclick="tog(D.${key},'${m.id}');renderStep()"
+        style="display:inline-flex;align-items:center;gap:6px">
+        <span>${m.icon}</span>${m.name}
+      </button>`).join('');
+
+    h+=`
+    <div class="field">
+      <label>Medios de pago <em>(multi)</em></label>
+      <div class="tg">${grid(PAYMENT_METHODS,D.payment_methods,'payment_methods')}</div>
+    </div>
+    <div class="field">
+      <label>Notas de pago <em>(opcional)</em></label>
+      <input type="text" id="f_paynotes" value="${D.payment_notes}"
+        placeholder="ej. MercadoPago con cuotas, límite de monto, etc."/>
+    </div>
+    <div style="height:12px"></div>
+    <div class="field">
+      <label>Medios de envío <em>(multi)</em></label>
+      <div class="tg">${grid(SHIPPING_METHODS,D.shipping_methods,'shipping_methods')}</div>
+    </div>
+    <div class="field">
+      <label>Notas de envío <em>(opcional)</em></label>
+      <input type="text" id="f_shipnotes" value="${D.shipping_notes}"
+        placeholder="ej. Envío gratis a partir de $50.000, zonas de cobertura, etc."/>
+    </div>`;}
+
+  if(s.id==='output'){h+=`
+    <div class="field"><label>Canal de documentación <em>(multi)</em></label>
+      <div class="og">${OUTPUTS.map(o=>`
+        <div class="oc ${D.outputs.includes(o.id)?'on':''}" onclick="tog(D.outputs,'${o.id}');renderStep()">
+          <div class="icon">${o.icon}</div><div class="name">${o.name}</div><div class="desc">${o.desc}</div>
+        </div>`).join('')}</div></div>
+    ${D.outputs.includes('slack')?`
+    <div class="hint"><strong>💬 Slack:</strong> Se generará el contenido de un Canvas para pegar en el room. El cliente podrá ver el progreso del proyecto desde Slack.</div>
+    <div class="field"><label>Nombre del room de Slack <em>*</em></label>
+      <input type="text" id="f_slack" value="${D.slack_room}" placeholder="#proyecto-nombretienda"/></div>`:''}
+    ${(D.outputs.includes('gsheet')||D.outputs.includes('gdoc'))?`
+    <div class="hint"><strong>📊 Doc/Sheet:</strong> Se generará una landing interactiva que podés compartir con el cliente. Podés imprimir como PDF o copiar el link.</div>`:''}
+    `;}
+
+  h+=`<div class="nav">
+    ${cur>0?`<button class="btn btn-ghost" onclick="goBack()">← Anterior</button>`:''}
+    ${cur<STEPS.length-1
+      ?`<button class="btn btn-blue" onclick="goNext()">Siguiente →</button>`
+      :`<button class="btn btn-green" onclick="generateAll()">✨ Generar proyecto con IA</button>`}
+  </div>`;
+  card.innerHTML=h;
+}
+
+function saveFields(){
+  const g=id=>{const el=document.getElementById(id);return el?el.value:''};
+  const s=STEPS[cur];
+  if(s.id==='brand')    {D.brand=g('f_brand');D.country=g('f_country');D.segment=g('f_segment')}
+  if(s.id==='project')  {D.start=g('f_start');D.end=g('f_end')}
+  if(s.id==='tech')     {D.url=g('f_url');D.admin_url=g('f_admin')}
+  if(s.id==='team')     {D.contact_name=g('f_cname');D.contact_email=g('f_cemail');D.agency_name=g('f_agency')||D.agency_name;D.extra=g('f_extra')}
+  if(s.id==='payments') {D.payment_notes=g('f_paynotes');D.shipping_notes=g('f_shipnotes')}
+  if(s.id==='output')   {D.slack_room=g('f_slack')||D.slack_room}
+}
+function deriveAdmin(){
+  const u=document.getElementById('f_url');const a=document.getElementById('f_admin');
+  if(!u||!a)return;try{const p=new URL(u.value);a.value=`https://${p.hostname}`;D.admin_url=a.value}catch{}
+}
+function goNext(){saveFields();if(cur<STEPS.length-1){cur++;renderStep()}}
+function goBack(){saveFields();if(cur>0){cur--;renderStep()}}
+
+// ── CHECKLIST HTML ─────────────────────────────────────────────────
+function buildChecklistHTML(tasks){
+  let h='';
+  tasks.forEach((section,si)=>{
+    h+=`<div class="cl-section"><div class="cl-head">${section.label}<span class="cl-count">${section.items.length}</span></div>`;
+    section.items.forEach((item,ii)=>{
+      const id=`ck_${si}_${ii}`;
+      if(!(id in checkState))checkState[id]=false;
+      const done=checkState[id];
+      const badge=item.req?`<span class="cl-badge b-req">REQ</span>`:`<span class="cl-badge b-opt">OPT</span>`;
+      const isAP=item.resp&&item.resp.includes('AP');
+      const respBadge=isAP?`<span class="cl-badge b-ap">AP</span>`:'';
+      const links=[];
+      if(item.admin)links.push(`<a class="cl-link" href="${item.admin}" target="_blank">🔗 Admin</a>`);
+      if(item.help)links.push(`<a class="cl-link help" href="${item.help}" target="_blank">📖 Ayuda</a>`);
+      h+=`
+        <div class="cl-item ${done?'done':''}" id="row_${id}" onclick="toggleCheck('${id}')">
+          <input class="cl-cb" type="checkbox" id="${id}" ${done?'checked':''} onclick="event.stopPropagation();toggleCheck('${id}')"/>
+          <div class="cl-body">
+            <div class="cl-text">${badge}${respBadge} ${item.t}</div>
+            <div class="cl-resp">${item.resp}</div>
+            ${links.length?`<div class="cl-links">${links.join('')}</div>`:''}
+            ${item.note?`<div class="cl-note">${item.note}</div>`:''}
+          </div>
+        </div>`;
+    });
+    h+=`</div>`;
+  });
+  return h;
+}
+
+function toggleCheck(id){
+  checkState[id]=!checkState[id];
+  const cb=document.getElementById(id);
+  const row=document.getElementById('row_'+id);
+  if(cb)cb.checked=checkState[id];
+  if(row)row.classList.toggle('done',checkState[id]);
+  updateProgress();
+}
+
+function updateProgress(){
+  const keys=Object.keys(checkState);
+  const done=keys.filter(k=>checkState[k]).length;
+  const pct=keys.length?Math.round(done/keys.length*100):0;
+  const pf=document.getElementById('prog-fill');
+  const pl=document.getElementById('prog-lbl');
+  if(pf)pf.style.width=pct+'%';
+  if(pl)pl.textContent=`${done} / ${keys.length} tareas completadas (${pct}%)`;
+}
+
+function switchWeek(w){
+  activeWeek=w;
+  document.querySelectorAll('.wtab').forEach(el=>{
+    el.classList.toggle('active',el.dataset.w===w);
+  });
+  document.querySelectorAll('.week-panel').forEach(el=>{
+    el.classList.toggle('show',el.dataset.w===w);
+  });
+}
+
+// ── AI GENERATION ──────────────────────────────────────────────────
+async function generateAll(){
+  saveFields();
+  let adminBase=D.admin_url;
+  if(!adminBase&&D.url){try{const u=new URL(D.url);adminBase=`https://${u.hostname}`}catch{}}
+
+  const tasks=buildAllTasks(adminBase);
+  const card=document.getElementById('card');
+  card.style.animation='none';void card.offsetWidth;card.style.animation='fu .35s ease both';
+
+  card.innerHTML=`
+    <div class="s-label">Generando proyecto…</div>
+    <div class="s-title">✨ ${D.brand||'Nuevo Merchant'}</div>
+    <div style="margin-top:20px" class="ai-box">
+      <div class="ai-tag">Consultando IA…</div>
+      <div style="display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px">
+        <div class="ai-dots"><span></span><span></span><span></span></div>
+        Analizando el proyecto y personalizando el checklist de 5 semanas…
+      </div>
+    </div>`;
+
+  let aiContent='';
+  try{
+    const prompt=`Sos experta en onboarding de tiendas Tiendanube en Argentina, con experiencia en migraciones Evolución.
+Generá un análisis breve y personalizado (máximo 220 palabras) para este proyecto de onboarding:
+
+Marca: ${D.brand} (${D.country}) | Rubro: ${D.segment||'No especificado'}
+Tipo: ${D.type||'Standard'} | Inicio: ${D.start||'A definir'} | Go Live: ${D.end||'A definir'}
+URL tienda: ${D.url||'No especificada'}
+Integraciones: ${D.integrations.join(', ')||'Ninguna'}
+Medios de pago: ${D.payment_methods.map(id=>PAYMENT_METHODS.find(m=>m.id===id)?.name).filter(Boolean).join(', ')||'No definidos'}
+${D.payment_notes?'Notas de pago: '+D.payment_notes:''}
+Medios de envío: ${D.shipping_methods.map(id=>SHIPPING_METHODS.find(m=>m.id===id)?.name).filter(Boolean).join(', ')||'No definidos'}
+${D.shipping_notes?'Notas de envío: '+D.shipping_notes:''}
+Agencia de diseño: ${D.has_agency||'No definido'} ${D.agency_name?'('+D.agency_name+')':''}
+Referente del merchant: ${D.contact_name||'Sin datos'}
+Notas del kick off: ${D.extra||'Sin notas'}
+
+Tu respuesta debe tener:
+1. 🎯 Una bienvenida personalizada al proyecto (1-2 oraciones)
+2. ⚠️ 2-3 alertas específicas según el rubro, tipo de proyecto, integraciones, pagos o envíos
+3. 🔑 1-2 claves de éxito para este merchant en particular
+4. 🚀 Una frase motivadora de cierre
+
+Sé concisa, directa y profesional. Usá emojis para los encabezados de sección. Sin markdown pesado.`;
+
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+    });
+    const data=await res.json();
+    aiContent=data.content?.[0]?.text||'No se pudo generar el análisis.';
+  }catch(e){
+    aiContent='⚠️ No se pudo conectar con la IA. El checklist completo está disponible igual.';
+  }
+
+  // totals
+  const totalTasks=tasks.reduce((a,s)=>a+s.items.length,0);
+  const intTags=D.integrations.length?D.integrations.map(i=>`<span class="tag blue">${i}</span>`).join(''):`<span class="tag green">Sin integración</span>`;
+  const outTags=D.outputs.length?D.outputs.map(o=>`<span class="tag green">${OUTPUTS.find(x=>x.id===o)?.name}</span>`).join(''):`<span class="tag warn">No definido</span>`;
+
+  // week tabs + panels
+  const tabsH=tasks.map(s=>`<button class="wtab ${s.week==='SEMANA 1'?'active':''}" data-w="${s.week}" onclick="switchWeek('${s.week}')">${s.week}</button>`).join('');
+  const panelsH=tasks.map(s=>`<div class="week-panel ${s.week==='SEMANA 1'?'show':''}" data-w="${s.week}">${buildChecklistHTML([s])}</div>`).join('');
+
+  // Gantt HTML
+  const ganttRows=tasks.map(s=>{
+    const spans={
+      'SEMANA 1':    [true, false,false,false,false,false],
+      'SEMANA 2-3':  [false,true, true, false,false,false],
+      'SEMANA 3-4':  [false,false,true, true, false,false],
+      'SEMANA 4':    [false,false,false,true, false,false],
+      'SEMANA 5':    [false,false,false,false,true, false],
+    };
+    const cols=spans[s.week]||[false,false,false,false,false,false];
+    return `<tr>
+      <td>${s.week.replace('SEMANA ','S')}</td>
+      <td>${s.label.split('—')[1]?.trim()||s.label}</td>
+      ${cols.map(on=>on?`<td><div class="bar ${s.color}" style="width:100%"></div></td>`:'<td></td>').join('')}
+    </tr>`;
+  }).join('');
+
+  card.innerHTML=`
+    <div class="s-label">Proyecto generado · ${new Date().toLocaleDateString('es-AR')}</div>
+    <div class="s-title">🚀 ${D.brand||'Nuevo Merchant'} <span style="font-size:14px;color:var(--muted);font-family:IBM Plex Mono,monospace"> · ${D.country}</span></div>
+
+    <!-- AI ANALYSIS -->
+    <div class="ai-box">
+      <div class="ai-tag">✨ Análisis IA del proyecto</div>
+      <div class="ai-content">${aiContent.replace(/\n/g,'<br/>')}</div>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="sum-block"><div class="sum-head">Marca y proyecto</div>
+      <div class="sum-row"><span class="sk">Marca</span><span class="sv">${D.brand||'–'}</span></div>
+      <div class="sum-row"><span class="sk">País / Rubro</span><span class="sv">${D.country} · ${D.segment||'–'}</span></div>
+      <div class="sum-row"><span class="sk">Tipo</span><span class="sv">${D.type||'Standard'}</span></div>
+      <div class="sum-row"><span class="sk">Inicio → Go Live</span><span class="sv">${D.start||'–'} → ${D.end||'–'}</span></div>
+      <div class="sum-row"><span class="sk">Referente</span><span class="sv">${D.contact_name||'–'} ${D.contact_email?'· '+D.contact_email:''}</span></div>
+    </div>
+    <div class="sum-block"><div class="sum-head">Técnico</div>
+      <div class="sum-row"><span class="sk">Tienda</span><span class="sv">${D.url?`<a href="${D.url}" target="_blank">${D.url}</a>`:'–'}</span></div>
+      <div class="sum-row"><span class="sk">Admin</span><span class="sv">${adminBase?`<a href="${adminBase}/admin" target="_blank">Abrir admin →</a>`:'–'}</span></div>
+      <div class="sum-row"><span class="sk">Integraciones</span><span class="sv">${intTags}</span></div>
+      <div class="sum-row"><span class="sk">Agencia</span><span class="sv">${D.has_agency||'–'} ${D.agency_name?'· '+D.agency_name:''}</span></div>
+    </div>
+    <div class="sum-block"><div class="sum-head">Pagos y envíos</div>
+      <div class="sum-row"><span class="sk">Medios de pago</span><span class="sv">${D.payment_methods.length?D.payment_methods.map(id=>PAYMENT_METHODS.find(m=>m.id===id)?.name).filter(Boolean).map(n=>`<span class="tag blue">${n}</span>`).join(''):`<span class="tag warn">No definidos</span>`}</span></div>
+      ${D.payment_notes?`<div class="sum-row"><span class="sk">Notas pago</span><span class="sv">${D.payment_notes}</span></div>`:''}
+      <div class="sum-row"><span class="sk">Medios de envío</span><span class="sv">${D.shipping_methods.length?D.shipping_methods.map(id=>SHIPPING_METHODS.find(m=>m.id===id)?.name).filter(Boolean).map(n=>`<span class="tag green">${n}</span>`).join(''):`<span class="tag warn">No definidos</span>`}</span></div>
+      ${D.shipping_notes?`<div class="sum-row"><span class="sk">Notas envío</span><span class="sv">${D.shipping_notes}</span></div>`:''}
+    </div>
+    <div class="sum-block"><div class="sum-head">Comunicación</div>
+      <div class="sum-row"><span class="sk">Canales</span><span class="sv">${outTags}</span></div>
+      ${D.slack_room?`<div class="sum-row"><span class="sk">Slack room</span><span class="sv">${D.slack_room}</span></div>`:''}
+    </div>
+
+    <!-- GANTT -->
+    <div style="margin-top:24px">
+      <div class="s-label">Gantt de migración</div>
+      <div class="s-title" style="margin-bottom:10px;font-size:16px">📅 Cronograma de 5 semanas</div>
+      <div class="gantt">
+        <table>
+          <thead><tr><th>Bloque</th><th>Tarea</th><th>S1</th><th>S2</th><th>S3</th><th>S4</th><th>S5</th><th>S6</th></tr></thead>
+          <tbody>${ganttRows}</tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CHECKLIST -->
+    <div style="margin-top:28px">
+      <div class="s-label">Tablero de migración</div>
+      <div class="s-title" style="margin-bottom:6px;font-size:16px">📋 ${totalTasks} tareas · 5 semanas</div>
+      <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+      <div class="prog-lbl" id="prog-lbl">0 / ${totalTasks} tareas completadas (0%)</div>
+      <div class="week-tabs" style="margin-top:14px">${tabsH}</div>
+      <div id="checklist-panels">${panelsH}</div>
+    </div>
+
+    <!-- OUTPUT -->
+    ${renderOutputSection(adminBase,tasks)}
+
+    <div class="export-row">
+      <button class="btn btn-ghost" onclick="cur=0;checkState={};activeWeek='SEMANA 1';renderStep()">↩ Nuevo proyecto</button>
+      <button class="btn btn-ghost" onclick="copyResumen('${adminBase}')">📋 Copiar resumen</button>
+      <button class="btn btn-ghost" onclick="window.print()">🖨️ PDF</button>
+    </div>
+  `;
+}
+
+// ── OUTPUT ROUTING ─────────────────────────────────────────────────
+function renderOutputSection(adminBase, tasks){
+  if(!D.outputs.length || D.outputs.includes('none')) return '';
+  let h = `<div style="margin-top:28px"><div class="s-label">Canal de salida</div>`;
+
+  if(D.outputs.includes('slack')){
+    const room = D.slack_room || '#proyecto-tienda';
+    h += `
+    <div class="s-title" style="margin-bottom:8px;font-size:16px">💬 Slack · <code style="font-size:13px;color:var(--acc)">${room}</code></div>
+    <div class="hint"><strong>Creación automática:</strong> Hacé clic en el botón para crear el Canvas directamente en el room <strong>${room}</strong>. No necesitás copiar nada.</div>
+    <div id="slack-status" style="margin-top:10px">
+      <button class="btn btn-green" onclick="createSlackCanvas('${adminBase.replace(/'/g,"\\'")}')">
+        ⚡ Crear Canvas en Slack ahora
+      </button>
+    </div>`;
+  }
+
+  if(D.outputs.includes('gsheet') || D.outputs.includes('gdoc')){
+    h += `
+    <div style="margin-top:${D.outputs.includes('slack')?'20px':'0'}">
+    <div class="s-title" style="margin-bottom:8px;font-size:16px">📊 Google Sheet</div>
+    <div class="hint"><strong>Creación automática:</strong> Se copia tu tablero Gantt template y se renombra con el nombre del merchant. Quedará en tu Drive listo para compartir.</div>
+    <div id="sheet-status" style="margin-top:10px">
+      <button class="btn btn-green" onclick="createGoogleSheet()">
+        📊 Crear Sheet en Drive ahora
+      </button>
+    </div>
+    </div>`;
+  }
+
+  h += `</div>`;
+  return h;
+}
+
+// ── SLACK CANVAS CREATION (via Anthropic API + Slack MCP) ──────────
+async function createSlackCanvas(adminBase){
+  const statusEl = document.getElementById('slack-status');
+  const room = D.slack_room || '';
+  if(!room){ alert('Ingresá el nombre del room de Slack primero.'); return; }
+
+  statusEl.innerHTML = `
+    <div class="ai-box" style="padding:14px">
+      <div style="display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px">
+        <div class="ai-dots"><span></span><span></span><span></span></div>
+        Buscando el canal <strong style="color:var(--text)">${room}</strong> y creando el Canvas…
+      </div>
+    </div>`;
+
+  const payNames = D.payment_methods.map(id=>PAYMENT_METHODS.find(m=>m.id===id)?.name).filter(Boolean).join(', ') || 'No definidos';
+  const shipNames = D.shipping_methods.map(id=>SHIPPING_METHODS.find(m=>m.id===id)?.name).filter(Boolean).join(', ') || 'No definidos';
+  const a = adminBase || 'https://tienda.mitiendanube.com';
+
+  // Build Canvas-flavored Markdown for all 5 weeks
+  const tasks = buildAllTasks(a);
+  const canvasContent = buildSlackCanvasMd(tasks, a, payNames, shipNames);
+  const canvasTitle = `🚀 Onboarding – ${D.brand||'Merchant'} · ${D.country}`;
+
+  const systemPrompt = `Sos un asistente que crea Canvas en Slack para proyectos de onboarding de Tiendanube AR.
+Tu única tarea es:
+1. Usar slack_search_channels para buscar el canal "${room}" (probá sin el # si no encuentra)
+2. Usar slack_create_canvas para crear el canvas con el título y contenido provistos
+3. Usar slack_send_message para enviar un mensaje al canal avisando que el Canvas fue creado, con el link
+4. Devolver SOLO un JSON con: { "success": true, "canvas_url": "...", "channel_name": "...", "message": "Texto breve de confirmación" }
+Si hay error, devolver: { "success": false, "error": "descripción del error" }
+No escribas nada más, solo el JSON.`;
+
+  const userMsg = `Canal de Slack: ${room}
+Título del canvas: ${canvasTitle}
+Contenido del canvas (Canvas-flavored Markdown):
+${canvasContent}
+
+Ejecutá los pasos: buscar canal → crear canvas → enviar mensaje de notificación → devolver JSON de resultado.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userMsg }],
+        mcp_servers: [{
+          type: 'url',
+          url: 'https://mcp.slack.com/mcp',
+          name: 'slack-mcp'
+        }]
+      })
+    });
+
+    const data = await res.json();
+
+    // Extract JSON from response
+    const allText = (data.content || [])
+      .filter(b => b.type === 'text')
+      .map(b => b.text)
+      .join('');
+
+    let result;
+    try {
+      const jsonMatch = allText.match(/\{[\s\S]*\}/);
+      result = jsonMatch ? JSON.parse(jsonMatch[0]) : null;
+    } catch(e) { result = null; }
+
+    if(result && result.success){
+      statusEl.innerHTML = `
+        <div class="ai-box" style="border-color:rgba(0,229,160,.3);background:rgba(0,229,160,.05)">
+          <div style="font-size:13px;color:var(--acc);font-weight:600;margin-bottom:8px">✅ Canvas creado exitosamente</div>
+          <div style="font-size:13px;color:var(--text);margin-bottom:12px">${result.message||'El Canvas fue creado y el canal fue notificado.'}</div>
+          ${result.canvas_url ? `<a href="${result.canvas_url}" target="_blank" class="btn btn-green" style="text-decoration:none;font-size:12px">📋 Abrir Canvas en Slack →</a>` : ''}
+        </div>`;
+    } else {
+      const errMsg = result?.error || allText.slice(0, 300) || 'Error desconocido';
+      statusEl.innerHTML = `
+        <div class="ai-box" style="border-color:rgba(255,92,122,.3);background:rgba(255,92,122,.04)">
+          <div style="font-size:12px;color:var(--acc3);margin-bottom:8px">⚠️ No se pudo crear el Canvas automáticamente</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:12px">${errMsg}</div>
+          <div style="font-size:11px;color:var(--muted)">Verificá que el room <strong style="color:var(--text)">${room}</strong> exista y que Claude tenga acceso. También podés copiar el contenido manualmente:</div>
+          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-ghost" onclick="copyCanvasMd()">📋 Copiar Markdown del Canvas</button>
+            <button class="btn btn-ghost" onclick="createSlackCanvas('${a.replace(/'/g,"\\'")}')">↺ Reintentar</button>
+          </div>
+          <textarea id="canvas-md-hidden" style="display:none">${canvasContent}</textarea>
+        </div>`;
+    }
+  } catch(err) {
+    statusEl.innerHTML = `
+      <div class="ai-box" style="border-color:rgba(255,92,122,.3)">
+        <div style="font-size:12px;color:var(--acc3)">⚠️ Error de conexión: ${err.message}</div>
+        <div style="margin-top:10px;display:flex;gap:8px">
+          <button class="btn btn-ghost" onclick="copyCanvasMd()">📋 Copiar Markdown</button>
+          <button class="btn btn-ghost" onclick="createSlackCanvas('${a.replace(/'/g,"\\'")}')">↺ Reintentar</button>
+        </div>
+        <textarea id="canvas-md-hidden" style="display:none">${canvasContent}</textarea>
+      </div>`;
+  }
+}
+
+// ── CANVAS MARKDOWN (Slack Canvas-flavored) ────────────────────────
+function buildSlackCanvasMd(tasks, a, payNames, shipNames){
+  const dateStr = D.start ? `![](slack_date:${D.start})` : '–';
+  const goLiveStr = D.end ? `![](slack_date:${D.end})` : '–';
+
+  const taskSections = tasks.map(s => {
+    const items = s.items.map(it => {
+      const req = it.req ? '**[REQ]**' : '*[OPT]*';
+      const adminLink = it.admin ? ` · [Admin](${it.admin})` : '';
+      const helpLink = it.help ? ` · [Ayuda](${it.help})` : '';
+      const note = it.note ? `\n  _${it.note}_` : '';
+      return `- ☐ ${req} ${it.t} _(${it.resp})_${adminLink}${helpLink}${note}`;
+    }).join('\n');
+    return `## ${s.label}\n\n${items}`;
+  }).join('\n\n---\n\n');
+
+  return `# :rocket: Datos del proyecto
+
+| Campo | Valor |
+|---|---|
+| Tienda | [${D.url||'–'}](${D.url||'#'}) |
+| Tipo | ${D.type||'Standard'} |
+| Inicio | ${dateStr} |
+| Go Live | ${goLiveStr} |
+| Referente | ${D.contact_name||'–'} · ${D.contact_email||'–'} |
+| Integraciones | ${D.integrations.join(', ')||'Ninguna'} |
+| Pagos | ${payNames} |
+| Envíos | ${shipNames} |
+| Agencia | ${D.has_agency||'–'} ${D.agency_name?'– '+D.agency_name:''} |
+
+${D.extra ? `> :pushpin: **Notas del kick off:** ${D.extra}` : ''}
+
+---
+
+:white_check_mark: = Completa &nbsp; :large_blue_circle: = En curso &nbsp; :white_square_button: = Pendiente &nbsp; :red_circle: = Bloqueada
+
+---
+
+${taskSections}
+
+---
+
+_Generado automáticamente por el Wizard de Onboarding AR · Tiendanube_`;
+}
+
+function copyCanvasMd(){
+  const el = document.getElementById('canvas-md-hidden');
+  if(!el) return;
+  navigator.clipboard.writeText(el.value)
+    .then(()=>alert('✅ Markdown copiado. Creá un Canvas en Slack y pegalo.'))
+    .catch(()=>alert('No se pudo copiar automáticamente.'));
+}
+
+function escHtml(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+function copyResumen(adminBase){
+  const text=`ONBOARDING: ${D.brand} (${D.country})\nTipo: ${D.type}\nInicio: ${D.start} → Go Live: ${D.end}\nURL: ${D.url}\nAdmin: ${adminBase}\nIntegraciones: ${D.integrations.join(', ')||'Ninguna'}\nReferente: ${D.contact_name} (${D.contact_email})\nAgencia: ${D.has_agency} ${D.agency_name}\nCanales: ${D.outputs.map(o=>OUTPUTS.find(x=>x.id===o)?.name).join(', ')||'–'}\nNotas: ${D.extra}`;
+  navigator.clipboard.writeText(text)
+    .then(()=>alert('✅ Resumen copiado.'))
+    .catch(()=>alert('No se pudo copiar automáticamente.'));
+}
+
+// ── GOOGLE SHEET CREATION (via Anthropic API + Drive MCP) ──────────
+async function createGoogleSheet(){
+  const statusEl = document.getElementById('sheet-status');
+  const brandName = D.brand || 'Merchant';
+
+  statusEl.innerHTML = `
+    <div class="ai-box" style="padding:14px">
+      <div style="display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px">
+        <div class="ai-dots"><span></span><span></span><span></span></div>
+        Copiando el tablero Gantt template para <strong style="color:var(--text)">${brandName}</strong>…
+      </div>
+    </div>`;
+
+  const systemPrompt = `Sos un asistente que crea archivos en Google Drive para proyectos de onboarding de Tiendanube AR.
+Tu única tarea es usar la herramienta copy_file de Google Drive con los parámetros exactos que te doy y devolver SOLO un JSON con el resultado.
+No escribas nada más, solo el JSON.
+Si hay éxito: { "success": true, "file_id": "...", "view_url": "...", "title": "..." }
+Si hay error: { "success": false, "error": "descripción breve" }`;
+
+  const newTitle = `[Zule] Onboarding_AR_Tablero_Gantt – ${brandName}`;
+  const userMsg = `Copiá el archivo de Google Drive con fileId "1cwA4d0sv6x4MaPK8KDjkyu7-1KZQ8l4ZnOlbwmbPp2g" y ponele el título "${newTitle}". Usá copy_file y devolvé el JSON del resultado.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 500,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userMsg }],
+        mcp_servers: [{
+          type: 'url',
+          url: 'https://drivemcp.googleapis.com/mcp/v1',
+          name: 'google-drive-mcp'
+        }]
+      })
+    });
+
+    const data = await res.json();
+    const allText = (data.content || [])
+      .filter(b => b.type === 'text')
+      .map(b => b.text)
+      .join('');
+
+    let result;
+    try {
+      const jsonMatch = allText.match(/\{[\s\S]*\}/);
+      result = jsonMatch ? JSON.parse(jsonMatch[0]) : null;
+    } catch(e) { result = null; }
+
+    if(result && result.success){
+      statusEl.innerHTML = `
+        <div class="ai-box" style="border-color:rgba(0,229,160,.3);background:rgba(0,229,160,.05)">
+          <div style="font-size:13px;color:var(--acc);font-weight:600;margin-bottom:8px">✅ Sheet creada en tu Drive</div>
+          <div style="font-size:13px;color:var(--text);margin-bottom:12px">${result.title||newTitle}</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <a href="${result.view_url}" target="_blank" class="btn btn-green" style="text-decoration:none;font-size:12px">📊 Abrir en Google Sheets →</a>
+          </div>
+        </div>`;
+    } else {
+      const errMsg = result?.error || allText.slice(0, 250) || 'Error desconocido';
+      statusEl.innerHTML = `
+        <div class="ai-box" style="border-color:rgba(255,92,122,.3);background:rgba(255,92,122,.04)">
+          <div style="font-size:12px;color:var(--acc3);margin-bottom:6px">⚠️ No se pudo crear la Sheet automáticamente</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:10px">${errMsg}</div>
+          <button class="btn btn-ghost" onclick="createGoogleSheet()">↺ Reintentar</button>
+        </div>`;
+    }
+  } catch(err) {
+    statusEl.innerHTML = `
+      <div class="ai-box" style="border-color:rgba(255,92,122,.3)">
+        <div style="font-size:12px;color:var(--acc3)">⚠️ Error de conexión: ${err.message}</div>
+        <button class="btn btn-ghost" style="margin-top:10px" onclick="createGoogleSheet()">↺ Reintentar</button>
+      </div>`;
+  }
+}
+
+renderStep();
+</script>
+</body>
+</html>
